@@ -31,5 +31,6 @@ Follow these steps to set up and run the **Skin Disease Detection App** locally.
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/your-username/skin_disease_app.git
+   git clone https://github.com/Shahporan73/skin_disease_detection_app.git
    cd skin_disease_app
+
