@@ -6,6 +6,17 @@ class ResultWidget extends StatelessWidget {
 
   const ResultWidget({super.key, required this.classifications});
 
+  // লেবেলের বাংলা ব্যাখ্যা
+  Map<String, String> get _labelDescriptions => {
+    'akiec': 'অ্যাকটিনিক কেরাটোসিস: ত্বকের প্রাক-ক্যান্সার অবস্থা, সূর্যের রশ্মির কারণে হয়।',
+    'bcc': 'বেসাল সেল কার্সিনোমা: ত্বকের ক্যান্সার, সাধারণত মুখ বা ঘাড়ে দেখা যায়।',
+    'bkl': 'সৌম্য কেরাটোসিস: অ-ক্যান্সারজনক ত্বকের ক্ষত, দেখতে ক্যান্সারের মতো হতে পারে।',
+    'df': 'ডার্মাটোফাইব্রোমা: সৌম্য ত্বকের বৃদ্ধি, শক্ত গাঁট হিসেবে প্রকাশ পায়।',
+    'mel': 'মেলানোমা: ত্বকের বিপজ্জনক ক্যান্সার, দ্রুত ছড়িয়ে পড়তে পারে।',
+    'nv': 'মেলানোসাইটিক নেভি: সাধারণ তিল, সাধারণত সৌম্য।',
+    'vasc': 'ভাস্কুলার ক্ষত: রক্তনালী-সম্পর্কিত ত্বকের অবস্থা।',
+  };
+
   Color _getConfidenceColor(double confidence) {
     if (confidence > 0.8) return Colors.green;
     if (confidence > 0.6) return Colors.orange;
@@ -27,77 +38,83 @@ class ResultWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Top Result Card
+        // প্রধান ফলাফল
         if (classifications.isNotEmpty)
-          Container(
-            padding: const EdgeInsets.all(16),
-            margin: const EdgeInsets.only(bottom: 16),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  _getConfidenceColor(classifications.first.confidence).withOpacity(0.1),
-                  _getConfidenceColor(classifications.first.confidence).withOpacity(0.05),
-                ],
-              ),
+          Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
+              side: BorderSide(
                 color: _getConfidenceColor(classifications.first.confidence),
                 width: 2,
               ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      _getConfidenceIcon(classifications.first.confidence),
-                      color: _getConfidenceColor(classifications.first.confidence),
-                      size: 28,
-                    ),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'প্রধান শনাক্তকরণ',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  classifications.first.label,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'নির্ভরযোগ্যতা: ${(classifications.first.confidence * 100).toStringAsFixed(1)}%',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    Text(
-                      _getConfidenceText(classifications.first.confidence),
-                      style: TextStyle(
-                        fontSize: 14,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        _getConfidenceIcon(classifications.first.confidence),
                         color: _getConfidenceColor(classifications.first.confidence),
-                        fontWeight: FontWeight.w500,
+                        size: 28,
                       ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'প্রধান শনাক্তকরণ',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    classifications.first.label,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _labelDescriptions[classifications.first.label] ?? 'বর্ণনা নেই: লেবেল ${classifications.first.label}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'নির্ভরযোগ্যতা: ${(classifications.first.confidence * 100).toStringAsFixed(1)}%',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      Text(
+                        _getConfidenceText(classifications.first.confidence),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: _getConfidenceColor(classifications.first.confidence),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
 
-        // Other Results
+        // অন্যান্য সম্ভাবনা
         if (classifications.length > 1) ...[
+          const SizedBox(height: 16),
           const Text(
             'অন্যান্য সম্ভাবনা:',
             style: TextStyle(
@@ -121,8 +138,20 @@ class ResultWidget extends StatelessWidget {
                 result.label,
                 style: const TextStyle(fontWeight: FontWeight.w500),
               ),
-              subtitle: Text(
-                'নির্ভরযোগ্যতা: ${(result.confidence * 100).toStringAsFixed(1)}%',
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'নির্ভরযোগ্যতা: ${(result.confidence * 100).toStringAsFixed(1)}%',
+                  ),
+                  Text(
+                    _labelDescriptions[result.label] ?? 'বর্ণনা নেই: লেবেল ${result.label}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
               ),
               trailing: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -139,36 +168,34 @@ class ResultWidget extends StatelessWidget {
                 ),
               ),
             ),
-          )).toList(),
+          )),
         ],
 
-        // Disclaimer
-        if (classifications.isNotEmpty) ...[
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.amber.shade50,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.amber.shade200),
-            ),
-            child: const Row(
-              children: [
-                Icon(Icons.info_outline, color: Colors.amber),
-                SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'দ্রষ্টব্য: এটি একটি প্রাথমিক শনাক্তকরণ। চূড়ান্ত নির্ণয়ের জন্য অবশ্যই চিকিৎসকের পরামর্শ নিন।',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.amber,
-                    ),
+        // ডিসক্লেইমার
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.amber.shade50,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.amber.shade200),
+          ),
+          child: const Row(
+            children: [
+              Icon(Icons.info_outline, color: Colors.amber),
+              SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'দ্রষ্টব্য: এটি একটি প্রাথমিক শনাক্তকরণ। চূড়ান্ত নির্ণয়ের জন্য অবশ্যই চিকিৎসকের পরামর্শ নিন।',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.amber,
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ],
     );
   }
