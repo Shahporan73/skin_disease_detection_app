@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'providers/app_provider.dart';
+import 'package:get/get.dart';
 import 'screens/home_screen.dart';
 
 void main() {
@@ -12,19 +11,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AppProvider()),
-      ],
-      child: MaterialApp(
-        title: 'ত্বকের রোগ শনাক্তকারী',
-        theme: ThemeData(
-          primarySwatch: Colors.teal,
-          useMaterial3: true,
-        ),
-        home: const HomeScreen(),
-        debugShowCheckedModeBanner: false,
+    return GetMaterialApp(
+      title: 'ত্বকের রোগ শনাক্তকারী',
+      theme: ThemeData(
+        primarySwatch: Colors.teal,
+        useMaterial3: true,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
+      home: const HomeScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
